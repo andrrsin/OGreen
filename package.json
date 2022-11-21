@@ -1,0 +1,28 @@
+{
+  "name": "ogreen",
+  "version": "1.0.0",
+  "description": "O-Gree is the project chosen in the subject Web Application Design. It is a web application whose objective is making a community of users who can create and participate in events all around the world including the possibility to be online. These events are green events related to ecologism, such as cleaning of places, vegeterian cooking sessions, handcrafting,  or bigger festivals such music festivals who support ecologic projects or charity events.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Garabato110/OGreen.git"
+  },
+  "author": "Andres Cadenas Blanco",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Garabato110/OGreen/issues"
+  },
+  "homepage": "https://github.com/Garabato110/OGreen#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "helmet": "^6.0.0",
+    "mongoose": "^6.7.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.20"
+  }
+}
