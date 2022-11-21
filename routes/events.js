@@ -38,7 +38,7 @@ router.delete('/:id', async (req, res) => {
       res.status(200).json("Event deleted successfully");
 
     } else {
-      res.status(403).json("You can update only your event!");
+      res.status(403).json("You can delete only your event!");
     }
   } catch (err) {
     res.status(404).json("Event not found!");

@@ -29,7 +29,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/events/announcements", announcementRoutes);
-app.use("/api/events/posts", postRoutes);
+app.use("/api/posts", postRoutes);
 
 
 app.listen(8800, () => {
