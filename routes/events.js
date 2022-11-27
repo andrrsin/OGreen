@@ -5,6 +5,7 @@ const User = require('../models/User');
 router.post('/', async (req, res) => {
   const newEvent = new Event(req.body);
   try {
+    newEvent.organizers.push(req.body.userId);
     const savedEvent = await newEvent.save();
     res.status(200).json(savedEvent);
   } catch (err) {
@@ -13,9 +14,11 @@ router.post('/', async (req, res) => {
 });
 //update Event
 router.put('/:id', async (req, res) => {
+
   try {
     const event = await Event.findById(req.params.id);
-    if (event.userId === req.body.userId || req.body.isAdmin) {
+    const organizers = event.organizers;
+    if (organizers.includes(req.body.userId) || req.body.isAdmin) {
 
       await event.updateOne({ $set: req.body });
       res.status(200).json("Event updated successfully");
@@ -24,7 +27,7 @@ router.put('/:id', async (req, res) => {
       res.status(403).json("You can update only your event!");
     }
   } catch (err) {
-    res.status(404).json("Event not found!");
+    res.status(404).json(err);//"Event not found!");
   }
 });
 
@@ -44,6 +47,7 @@ router.delete('/:id', async (req, res) => {
     res.status(404).json("Event not found!");
   }
 });
+
 //participate in Event
 router.put("/:id/participate", async (req, res) => {
   try {
@@ -59,6 +63,26 @@ router.put("/:id/participate", async (req, res) => {
     res.status(404).json("Event not found!");
   }
 });
+//Add organizer
+router.put("/:id/organize", async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (event.userId === req.body.userId || req.body.isAdmin) {
+      if (!event.organizers.includes(req.body.organizer)) {
+        await event.updateOne({ $push: { organizers: req.body.organizer } });
+        res.status(200).json("You have added as organizer!");
+      } else {
+        await post.updateOne({ $pull: { organizers: req.body.organizer } });
+        res.status(200).json("You have removed as organizer");
+      }
+    } else {
+      res.status(403).json("You can add organizers only in your event!");
+    }
+  } catch (err) {
+    res.status(404).json("Event not found!");
+  }
+});
+
 //get Event
 router.get("/:id", async (req, res) => {
   try {
@@ -99,6 +123,7 @@ router.get("/timeline/user", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
 
 
 module.exports = router;

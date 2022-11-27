@@ -17,7 +17,7 @@ const AnnouncementSchema = new mongoose.Schema(
         description: {
             type: String,
             max: 2000,
-            default:"",s
+            default:"",
         },
         img: {
             type: String,
