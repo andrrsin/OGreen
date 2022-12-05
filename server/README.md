@@ -39,4 +39,4 @@ _Administrator_ users can:
 	- Manage their profile
 ## 1.3 System Architecture
 **Front End** will be done using React.js
-**Back End** will be programmed using Django with a database of MySQL
+**Back End** will be programmed using Node.js with a database of MongoDB
