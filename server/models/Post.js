@@ -8,7 +8,8 @@ const PostSchema = new mongoose.Schema(
         },
         eventId: {
             type: String,
-            required: true,
+            default: "",
+
         },
         description: {
             type: String,

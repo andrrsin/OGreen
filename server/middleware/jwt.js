@@ -19,7 +19,8 @@ function authenticateToken(req, res, next) {
     jwt.verify(token, process.env.TOKEN_KEY, (err, user) => {
         console.log(err)
 
-        if (err) return res.sendStatus(403).json("We are sorry you have an invalid token.");
+        if (err) 
+            return res.sendStatus(403).json("We are sorry you have an invalid token.");
 
         req.user = user
 
