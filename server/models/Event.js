@@ -9,6 +9,7 @@ const EventSchema = new mongoose.Schema(
         title: {
             type: String,
             required: true,
+            unique: true,
         },
         description: {
             type: String,
@@ -26,11 +27,6 @@ const EventSchema = new mongoose.Schema(
         img: {
             type: String,
             default: "",
-        },
-        tags:{
-            type: Array,
-            default: [],
-
         },
         organizers: {
             type: Array,

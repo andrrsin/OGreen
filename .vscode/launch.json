@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "type": "node-terminal",
+            "name": "Run client",
+            "request": "launch",
+            "command": "npm run start",
+            "cwd": "${workspaceFolder}\\client"
+        },
+        {
+            "type": "node-terminal",
+            "name": "Run server",
+            "request": "launch",
+            "command": "npm run start",
+            "cwd": "${workspaceFolder}\\server"
+        }
+    ]
+}

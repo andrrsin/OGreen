@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const router = require('express').Router();
 const Announcement = require('../models/Announcement');
 const tokenManager = require('../middleware/jwt');
-
+const Post = require('../models/Post');
 
 //update user
 router.patch("/:id",tokenManager.authenticateToken, async (req, res) => {
@@ -29,7 +29,7 @@ router.patch("/:id",tokenManager.authenticateToken, async (req, res) => {
     }
 });
 //delete user
-router.delete("/:id", async (req, res) => {
+router.delete("/:id",tokenManager.authenticateToken, async (req, res) => {
     if (req.body.userId === req.params.id || req.body.isAdmin) {
         try {
             await User.findByIdAndDelete(req.params.id);
@@ -44,9 +44,13 @@ router.delete("/:id", async (req, res) => {
 
 
 //get a user
-router.get("/:id", async (req, res) => {
+router.get("/",tokenManager.authenticateToken, async (req, res) => {
+    const userId = req.query.userId;
+    const username = req.query.username;
     try {
-        const user = await User.findById(req.params.id);
+        const user = userId
+            ? await User.findById(userId)
+            : await User.findOne({ username: username });
         const { password, updatedAt, ...other } = user._doc;
         res.status(200).json(other);
     } catch (err) {
@@ -54,7 +58,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 //follow a user
-router.patch("/:id/follow", async (req, res) => {
+router.patch("/:id/follow",tokenManager.authenticateToken, async (req, res) => {
     if (req.body.userId !== req.params.id) {
         try {
             const user = await User.findById(req.params.id);
@@ -75,7 +79,7 @@ router.patch("/:id/follow", async (req, res) => {
 });
 
 //unfollow a user
-router.patch("/:id/unfollow", async (req, res) => {
+router.patch("/:id/unfollow",tokenManager.authenticateToken, async (req, res) => {
     if (req.body.userId !== req.params.id) {
         try {
             const user = await User.findById(req.params.id);
@@ -95,13 +99,55 @@ router.patch("/:id/unfollow", async (req, res) => {
     }
 });
 
+//Get User followers
+router.get("/:id/followers",tokenManager.authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        const followers = await Promise.all(
+            user.followers.map((followerId) => {
+                return User.findById(followerId);
+            })
+        );
+        res.status(200).json(followers);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+//Get User following
+router.get("/:id/following",tokenManager.authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        const followings = await Promise.all(
+            user.followings.map((followerId) => {
+                return User.findById(followerId);
+            })
+        );
+        res.status(200).json(followings);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
 //Get announcements by User
-router.get('/:id/announcements', async (req, res) => {
+router.get('/:id/announcements',tokenManager.authenticateToken, async (req, res) => {
     try {
         const userAnnouncements = await Announcement.find({ userId: req.params.id });
         res.status(200).json(userAnnouncements);
     } catch (err) {
         res.status(404).json(err);
+    }
+});
+
+//Get User's All Posts
+router.get("/posts/:username",tokenManager.authenticateToken, async (req, res) => {
+    try {
+        const currentUser = await User.findOne({ username: req.params.username });
+        
+        const userPost = await Post.find({ userId: currentUser._id });
+        res.status(200).json(userPost)
+    } catch (err) {
+        res.status(500).json(err);
     }
 });
 

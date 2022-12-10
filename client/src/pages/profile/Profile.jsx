@@ -1,14 +1,35 @@
 import "./profile.css"
 
+
 import Sidebar from '../../components/sidebar/Sidebar';
 import Topbar from '../../components/topbar/Topbar';
-import ProfileFeed from '../../components/profileFeed/ProfileFeed';
+import axios from "axios";
 import UserRightbar from "../../components/userRightbar/UserRightbar";
+import { useEffect, useState } from "react";
 
+import { useParams } from "react-router";
+import Feed from "../../components/feed/Feed";
 
 export default function Profile() {
-    return (
-        <>
+  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+  const [user, setUser] = useState({});
+  const username = useParams().username;
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await axios.get(`/users?username=${username}`, {headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }}
+        );
+      setUser(res.data);
+    };
+    fetchUser();
+  }, [username]);
+
+  
+
+  return (
+    <>
       <Topbar />
       <div className="profile">
         <Sidebar />
@@ -17,26 +38,34 @@ export default function Profile() {
             <div className="profileCover">
               <img
                 className="profileCoverImg"
-                src="assets/post/3.jpeg"
+                src={
+                  user.coverPicture
+                    ? PF + user.coverPicture
+                    : PF + "defaults/noCover.png"
+                }
                 alt=""
               />
               <img
                 className="profileUserImg"
-                src="assets/person/7.jpeg"
+                src={
+                  user.profilePicture
+                    ? PF + user.profilePicture
+                    : PF + "defaults/noAvatar.png"
+                }
                 alt=""
               />
             </div>
             <div className="profileInfo">
-                <h4 className="profileInfoName">Safak Kocaoglu</h4>
-                <span className="profileInfoDesc">Hello my friends!</span>
+              <h4 className="profileInfoName">{user.username}</h4>
+              <span className="profileInfoDesc">{user.description}</span>
             </div>
           </div>
           <div className="profileRightBottom">
-            <ProfileFeed />
-            <UserRightbar/>
+            <Feed username = {username}/>
+            <UserRightbar user={user} />
           </div>
         </div>
       </div>
     </>
-    )
+  );
 }

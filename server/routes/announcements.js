@@ -2,9 +2,9 @@ const router = require('express').Router();
 const Announcement = require('../models/Announcement');
 const Event = require('../models/Event');
 const User = require('../models/User');
-
+const tokenManager = require('../middleware/jwt');
 //Create announcement
-router.post('/', async (req, res) => {
+router.post('/',tokenManager.authenticateToken, async (req, res) => {
     try {
 
         const event = await Event.findById(req.body.eventId);
@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
     }
 });
 //Update announcement
-router.patch('/:id', async (req, res) => {
+router.patch('/:id',tokenManager.authenticateToken, async (req, res) => {
     try {
         const event = await Event.findById(req.body.eventId);
         const organizers = event.organizers;
@@ -39,7 +39,7 @@ router.patch('/:id', async (req, res) => {
     }
 });
 //Delete announcement
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',tokenManager.authenticateToken, async (req, res) => {
     try {
         const event = await Event.findById(req.body.eventId);
         const organizers = event.organizers;
@@ -57,7 +57,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 //Like/Dislike a announcement
-router.patch("/:id/like", async (req, res) => {
+router.patch("/:id/like",tokenManager.authenticateToken, async (req, res) => {
     try {
       const announcement = await Announcement.findById(req.params.id);
       if (!announcement.likes.includes(req.body.userId)) {

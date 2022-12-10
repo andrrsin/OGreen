@@ -2,8 +2,9 @@ const router = require('express').Router();
 const Event = require('../models/Event');
 const User = require('../models/User');
 const Announcement = require('../models/Announcement');
+const tokenManager = require('../middleware/jwt');
 //create Event
-router.post('/', async (req, res) => {
+router.post('/', tokenManager.authenticateToken, async (req, res) => {
   const newEvent = new Event(req.body);
   try {
     newEvent.organizers.push(req.body.userId);
@@ -14,7 +15,7 @@ router.post('/', async (req, res) => {
   }
 });
 //update Event
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', tokenManager.authenticateToken, async (req, res) => {
 
   try {
     const event = await Event.findById(req.params.id);
@@ -33,10 +34,10 @@ router.patch('/:id', async (req, res) => {
 });
 
 //delete Event
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', tokenManager.authenticateToken, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
-    
+
     if (event.userId === req.body.userId || req.body.isAdmin) {
       // const announcements = await Announcement.find({eventId:event.announcements});
       // announcements.forEach(async (announcement) => {
@@ -54,14 +55,17 @@ router.delete('/:id', async (req, res) => {
 });
 
 //participate in Event
-router.patch("/:id/participate", async (req, res) => {
+router.patch("/:id/participate", tokenManager.authenticateToken, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
+    const user = await User.findById(req.body.userId);
     if (!event.participants.includes(req.body.userId)) {
       await event.updateOne({ $push: { participants: req.body.userId } });
+      await user.updateOne({ $push: { events: req.params.id } });
       res.status(200).json("You have signed for the event!");
     } else {
       await post.updateOne({ $pull: { participants: req.body.userId } });
+      await user.updateOne({ $pull: { events: req.params.id } });
       res.status(200).json("The post has been disliked");
     }
   } catch (err) {
@@ -69,7 +73,7 @@ router.patch("/:id/participate", async (req, res) => {
   }
 });
 //Add organizer
-router.patch("/:id/organize", async (req, res) => {
+router.patch("/:id/organize", tokenManager.authenticateToken, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (event.userId === req.body.userId || req.body.isAdmin) {
@@ -89,16 +93,19 @@ router.patch("/:id/organize", async (req, res) => {
 });
 
 //get Event
-router.get("/:id", async (req, res) => {
+router.get("/byId/:id", tokenManager.authenticateToken, async (req, res) => {
+
   try {
-    const event = await Event.findById(req.params.id);
+
+    const event =  await Event.findById(req.params.id) ;
+
     res.status(200).json(event);
   } catch (err) {
     res.status(404).json(err);
   }
 });
 //get timeline Events
-router.get("/timeline", async (req, res) => {
+router.get("/timeline", tokenManager.authenticateToken, async (req, res) => {
   try {
 
     const currentUser = await User.findById(req.body.userId);
@@ -116,18 +123,28 @@ router.get("/timeline", async (req, res) => {
   }
 });
 
-//Get announcements by Event
-router.get('/:id/announcements', async (req, res) => {
+//get all Events
+router.get("/all", tokenManager.authenticateToken, async (req, res) => {
   try {
-      const eventAnnouncements = await Announcement.find({ eventId: req.params.id });
-      res.status(200).json(eventAnnouncements);
-} catch (err) {
-  res.status(404).json(err);
-}
+    const events = await Event.find({});
+    res.status(200).json(events);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+//Get announcements by Event
+router.get('/:id/announcements', tokenManager.authenticateToken, async (req, res) => {
+  try {
+    const eventAnnouncements = await Announcement.find({ eventId: req.params.id });
+    res.status(200).json(eventAnnouncements);
+  } catch (err) {
+    res.status(404).json(err);
+  }
 });
 
 //Get User's All Events
-router.get("/user", async (req, res) => {
+router.get("/user", tokenManager.authenticateToken, async (req, res) => {
   try {
 
     const currentUser = await User.findById(req.body.userId);

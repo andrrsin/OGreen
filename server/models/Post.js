@@ -13,12 +13,12 @@ const PostSchema = new mongoose.Schema(
         },
         description: {
             type: String,
-            max: 200,
-            default:"",
+            max: 500,
+            required: true,
         },
         img: {
             type: String,
-            required: true,
+            default:"",
         },
         likes: {
             type: Array,
