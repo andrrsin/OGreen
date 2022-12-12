@@ -8,6 +8,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { makeRequest } from '../../axios';
 
 export default function Post({ post }) {
     const PF = process.env.REACT_APP_PUBLIC_FOLDER;
@@ -15,16 +16,14 @@ export default function Post({ post }) {
     const [like, setLike] = useState(post.likes.length)
     const [isLiked, setIsLiked] = useState(false)
     const [user, setUser] = useState({});
-    const { user: currentUser } = useContext(AuthContext);
+    const {currentUser } = useContext(AuthContext);
     useEffect(() => {
         setIsLiked(post.likes.includes(currentUser._id));
     }, [currentUser._id, post.likes]);
 
     const likeHandler = () => {
         try {
-            axios.patch("/posts/" + post._id + "/like", { userId: currentUser._id },{headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-               }});
+            axios.patch("/posts/" + post._id + "/like", { userId: currentUser._id });
             setLike(isLiked ? like - 1 : like + 1);
             setIsLiked(!isLiked);
         } catch (err) { }
@@ -33,9 +32,7 @@ export default function Post({ post }) {
 
     useEffect(() => {
         const fetchUser = async () => {
-          const res = await axios.get(`/users?userId=${post.userId}`,{headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
-           }}
+          const res = await makeRequest.get(`/users?userId=${post.userId}`
 
           );
           setUser(res.data);

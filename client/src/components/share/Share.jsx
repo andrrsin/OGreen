@@ -9,7 +9,7 @@ import axios from "axios";
 import CloseIcon from '@mui/icons-material/Close';
 
 export default function Share() {
-  const { user } = useContext(AuthContext);
+  const { currentUser:user } = useContext(AuthContext);
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const desc = useRef();
   const [file, setFile] = useState(null);

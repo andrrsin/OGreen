@@ -10,7 +10,7 @@ import Event from "../event/Event";
 
 export default function EventsFeed() {
   const [posts, setPosts] = useState([]);
-  const { user } = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
 
   useEffect(() => {

@@ -6,7 +6,7 @@ const Comment = require('../models/Comment');
 const tokenManager = require('../middleware/jwt');
 
 //Create Post
-router.post('/',tokenManager.authenticateToken, async (req, res) => {
+router.post('/', async (req, res) => {
   const newPost = new Post(req.body);
   try {
     const savedPost = await newPost.save();
@@ -16,7 +16,7 @@ router.post('/',tokenManager.authenticateToken, async (req, res) => {
   }
 });
 //Update Post
-router.patch('/:id',tokenManager.authenticateToken, async (req, res) => {
+router.patch('/:id', async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (post.userId === req.body.userId || req.body.isAdmin) {
@@ -34,7 +34,7 @@ router.patch('/:id',tokenManager.authenticateToken, async (req, res) => {
 
 
 //Delete Post
-router.delete('/:id',tokenManager.authenticateToken, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (post.userId === req.body.userId || req.body.isAdmin) {
@@ -51,7 +51,7 @@ router.delete('/:id',tokenManager.authenticateToken, async (req, res) => {
 });
 
 //Like/Dislike a Post
-router.patch("/:id/like",tokenManager.authenticateToken, async (req, res) => {
+router.patch("/:id/like", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post.likes.includes(req.body.userId)) {
@@ -65,7 +65,7 @@ router.patch("/:id/like",tokenManager.authenticateToken, async (req, res) => {
   }
 });
 //Comment on a Post
-router.patch("/:id/comment",tokenManager.authenticateToken, async (req, res) => {
+router.patch("/:id/comment", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     const content = { postId: req.params.id, userId: req.body.userId, message: req.body.message };
@@ -79,7 +79,7 @@ router.patch("/:id/comment",tokenManager.authenticateToken, async (req, res) => 
 });
 
 //Modify a Comment
-router.patch("/:id/comment/:commentId",tokenManager.authenticateToken, async (req, res) => {
+router.patch("/:id/comment/:commentId", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     const comment = await Comment.findById(req.params.commentId);
@@ -95,7 +95,7 @@ router.patch("/:id/comment/:commentId",tokenManager.authenticateToken, async (re
 });
 
 //Delete a Comment
-router.delete("/:id/comment/:commentId",tokenManager.authenticateToken, async (req, res) => {
+router.delete("/:id/comment/:commentId", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     const comment = await Comment.findById(req.params.commentId);
@@ -111,7 +111,7 @@ router.delete("/:id/comment/:commentId",tokenManager.authenticateToken, async (r
 });
 
 //Like a comment
-router.patch("/:id/comment/:commentId/like",tokenManager.authenticateToken, async (req, res) => {
+router.patch("/:id/comment/:commentId/like", async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.commentId);
     if (!comment.likes.includes(req.body.userId)) {
@@ -127,7 +127,7 @@ router.patch("/:id/comment/:commentId/like",tokenManager.authenticateToken, asyn
 });
 
 //Get a Post
-router.get("/:id",tokenManager.authenticateToken, async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     res.status(200).json(post);
@@ -137,7 +137,7 @@ router.get("/:id",tokenManager.authenticateToken, async (req, res) => {
 });
 
 //Get Timeline Posts
-router.get("/timeline/:userId",tokenManager.authenticateToken, async (req, res) => {
+router.get("/timeline/:userId", async (req, res) => {
   try {
 
     const currentUser = await User.findById(req.params.userId);
@@ -156,7 +156,7 @@ router.get("/timeline/:userId",tokenManager.authenticateToken, async (req, res) 
 });
 
 //Get Events Posts
-router.get("/events/:eventId",tokenManager.authenticateToken, async (req, res) => {
+router.get("/events/:eventId", async (req, res) => {
   try {
     const eventPost = await Post.find({ eventId: req.params.eventId });
     res.status(200).json(eventPost);

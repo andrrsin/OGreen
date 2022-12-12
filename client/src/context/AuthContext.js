@@ -1,31 +1,36 @@
-import { createContext, useEffect, useReducer } from "react";
-import AuthReducer from "./AuthReducer";
+import axios from "axios";
+import { createContext, useEffect, useState } from "react";
 
-const INITIAL_STATE = {
-  user: null,
-  isFetching: false,
-  error: false,
-};
-
-
-export const AuthContext = createContext(INITIAL_STATE);
+export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(AuthReducer, INITIAL_STATE);
-  
-  useEffect(()=>{
-    localStorage.setItem("user", JSON.stringify(state.user))
-  },[state.user])
-  
+  const [currentUser, setCurrentUser] = useState(
+    JSON.parse(localStorage.getItem("user")) || null
+  );
+
+  const login = async (inputs) => {
+    
+    const res = await axios.post("http://localhost:8800/api/auth/login", inputs, {
+      withCredentials: true,
+    });
+    console.log("authentication Works")
+    setCurrentUser(res.data)
+  };
+
+  const update = async (inputs) => {
+    const res = await axios.get("http://localhost:8800/api/users?userId="+currentUser._id,  {
+      withCredentials: true,
+    });
+    console.log("update Works")
+    setCurrentUser(res.data)
+  };
+
+  useEffect(() => {
+    localStorage.setItem("user", JSON.stringify(currentUser));
+  }, [currentUser]);
+
   return (
-    <AuthContext.Provider
-      value={{
-        user: state.user,
-        isFetching: state.isFetching,
-        error: state.error,
-        dispatch,
-      }}
-    >
+    <AuthContext.Provider value={{ currentUser, login }}>
       {children}
     </AuthContext.Provider>
   );

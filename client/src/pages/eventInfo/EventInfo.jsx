@@ -9,6 +9,7 @@ import { useState } from "react";
 import DetailedEventFeed from "../../components/detailedEventFeed/DetailedEventFeed";
 import EventRightbar from "../../components/eventRightbar/EventRightbar";
 import { useParams } from "react-router";
+import { useEffect } from "react";
 
 
 export default function EventInfo() {
@@ -16,17 +17,21 @@ export default function EventInfo() {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   
   const eventId = useParams().eventId;
-  const fetchUser = async () => {
-    const res = await axios.get(`/events/byId/`+eventId, {headers: {
-      'Authorization': 'Bearer ' + localStorage.getItem('token')
-    }}
-      );
-      
-      return res.data;
-  };
-  const [event, setEvent] = useState(fetchUser());
-
   
+
+  const [event, setEvent] = useState();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await axios.get(`/events/byId/`+eventId, {headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }}
+        );
+        
+        setEvent(res.data);
+    };
+    fetchUser()
+  }, [eventId]);
 
   
 

@@ -1,23 +1,37 @@
 import "./login.css";
-import { useRef, useContext } from "react";
-import { loginCall } from "../../auth";
+import { useContext } from "react";
+import { useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 export default function Login() {
-  const email = useRef();
-  const password = useRef();
-  const navigate = useNavigate();
-  const { isFetching, dispatch } = useContext(AuthContext);
-  const handleClick = (e) => {
+
+
+
+  const [inputs, setInputs] = useState({
+    email: "",
+    password: "",
+  });
+  const [err, setErr] = useState(null);
+
+  const navigate = useNavigate()
+
+  const handleChange = (e) => {
+    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+  const { login } = useContext(AuthContext);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    loginCall(
-      { email: email.current.value, password: password.current.value },
-      dispatch
-    );
-    
+    try {
+        
+      await login(inputs);
+      navigate("/")
+    } catch (err) {
+      setErr(err.response.data);
+    }
   };
 
   const handleCreate = () => {
@@ -35,18 +49,19 @@ export default function Login() {
         </div>
         <div className="loginRight">
           <div className="loginBox">
-            <form className="loginBox" onSubmit={handleClick}>
-              <input placeholder="Email" type="email" required className="loginInput" ref={email} />
-              <input placeholder="Password" type="password" required minLength="8" className="loginInput" ref={password} />
-              <button className="loginButton" type="submit" disabled={isFetching}>
-                {isFetching ? "Loading..." : "Log In"}
+            <form className="loginBox">
+              <input placeholder="Email" type="email" required className="loginInput"  name = "email" onChange={handleChange} />
+              <input placeholder="Password" type="password" required minLength="8" className="loginInput" name = "password" onChange={handleChange} />
+              {err ? <span className="loginErr">{err}</span> : null}
+              <button className="loginButton" type="submit" onClick={handleLogin}>
+                Log In
               </button>
             </form>
             <Link to="/forgotpassword" className="loginForgot">
               <span className="loginForgot">Forgot Password?</span>
             </Link>
             <button className="loginRegisterButton" onClick={handleCreate}>
-              {isFetching ? "Loading..." : "Create a New Account"}
+              Create a New Account
             </button>
           </div>
         </div>

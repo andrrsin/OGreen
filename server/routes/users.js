@@ -6,7 +6,7 @@ const tokenManager = require('../middleware/jwt');
 const Post = require('../models/Post');
 
 //update user
-router.patch("/:id",tokenManager.authenticateToken, async (req, res) => {
+router.patch("/:id", async (req, res) => {
     if (req.body.userId === req.params.id || req.body.isAdmin) {
         if (req.body.password) {
             try {
@@ -20,7 +20,7 @@ router.patch("/:id",tokenManager.authenticateToken, async (req, res) => {
             const user = await User.findByIdAndUpdate(req.params.id, {
                 $set: req.body,
             });
-            res.status(200).json("Account has been updated");
+            res.status(200).json(user);
         } catch (err) {
             return res.status(500).json(err);
         }
@@ -29,7 +29,7 @@ router.patch("/:id",tokenManager.authenticateToken, async (req, res) => {
     }
 });
 //delete user
-router.delete("/:id",tokenManager.authenticateToken, async (req, res) => {
+router.delete("/:id", async (req, res) => {
     if (req.body.userId === req.params.id || req.body.isAdmin) {
         try {
             await User.findByIdAndDelete(req.params.id);
@@ -44,7 +44,7 @@ router.delete("/:id",tokenManager.authenticateToken, async (req, res) => {
 
 
 //get a user
-router.get("/",tokenManager.authenticateToken, async (req, res) => {
+router.get("/", async (req, res) => {
     const userId = req.query.userId;
     const username = req.query.username;
     try {
@@ -58,7 +58,7 @@ router.get("/",tokenManager.authenticateToken, async (req, res) => {
     }
 });
 //follow a user
-router.patch("/:id/follow",tokenManager.authenticateToken, async (req, res) => {
+router.patch("/:id/follow", async (req, res) => {
     if (req.body.userId !== req.params.id) {
         try {
             const user = await User.findById(req.params.id);
@@ -79,7 +79,7 @@ router.patch("/:id/follow",tokenManager.authenticateToken, async (req, res) => {
 });
 
 //unfollow a user
-router.patch("/:id/unfollow",tokenManager.authenticateToken, async (req, res) => {
+router.patch("/:id/unfollow", async (req, res) => {
     if (req.body.userId !== req.params.id) {
         try {
             const user = await User.findById(req.params.id);
@@ -100,7 +100,7 @@ router.patch("/:id/unfollow",tokenManager.authenticateToken, async (req, res) =>
 });
 
 //Get User followers
-router.get("/:id/followers",tokenManager.authenticateToken, async (req, res) => {
+router.get("/:id/followers", async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         const followers = await Promise.all(
@@ -115,7 +115,7 @@ router.get("/:id/followers",tokenManager.authenticateToken, async (req, res) => 
 });
 
 //Get User following
-router.get("/:id/following",tokenManager.authenticateToken, async (req, res) => {
+router.get("/:id/following", async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         const followings = await Promise.all(
@@ -130,7 +130,7 @@ router.get("/:id/following",tokenManager.authenticateToken, async (req, res) => 
 });
 
 //Get announcements by User
-router.get('/:id/announcements',tokenManager.authenticateToken, async (req, res) => {
+router.get('/:id/announcements', async (req, res) => {
     try {
         const userAnnouncements = await Announcement.find({ userId: req.params.id });
         res.status(200).json(userAnnouncements);
@@ -140,7 +140,7 @@ router.get('/:id/announcements',tokenManager.authenticateToken, async (req, res)
 });
 
 //Get User's All Posts
-router.get("/posts/:username",tokenManager.authenticateToken, async (req, res) => {
+router.get("/posts/:username", async (req, res) => {
     try {
         const currentUser = await User.findOne({ username: req.params.username });
         
